@@ -3,8 +3,6 @@ on:
   push:
     tags:
       - v*.*.*
-permissions:
-  contents: write
 env:
   PROVIDER: "pulumi-resource-azure-static-website"
   # THIS GITHUB_TOKEN IS A REQUIREMENT TO BE ABLE TO WRITE TO GH RELEASES
