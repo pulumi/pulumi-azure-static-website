@@ -1,4 +1,4 @@
-module github.com/pulumi/pulumi-xyz/sdk
+module github.com/pulumi/pulumi-azure-static-website/sdk
 
 go 1.17
 

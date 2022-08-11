@@ -1,4 +1,4 @@
-module github.com/pulumi/pulumi-xyz
+module github.com/pulumi/pulumi-azure-static-website
 
 go 1.17
 
