@@ -6,7 +6,7 @@
             "inputProperties": {
                 "withCDN": {
                     "type": "boolean",
-                    "description": "Provision CloudFront CDN to serve content."
+                    "description": "Provision CDN to serve content."
                 },
                 "sitePath": {
                     "type": "string",
@@ -18,7 +18,23 @@
                 },
                 "errorDocument": {
                     "type": "string",
-                    "description": "default 404 page"
+                    "description": "The default 404 error page"
+                },
+                "withCustomDomain": {
+                    "type": "boolean",
+                    "description": "Provision a custom domain to serve the site from. This will require a you to set the domainResourceGroup property to the name of the resource group your domain is attached to, as well as the dnsZoneName property for the name of the DNS zone, configured in Azure"
+                },
+                "domainResourceGroup": {
+                    "type": "string",
+                    "description": "The name of the resource group your domain is attached to"
+                },
+                "dnsZoneName": {
+                    "type": "string",
+                    "description": "The name of the DNS zone."
+                },
+                "subdomain": {
+                    "type": "string",
+                    "description": "The subdomain used to access the static website. If not specified will configure with apex/root domain of the DNS zone specified."
                 }
             },
             "requiredInputs": [
@@ -27,19 +43,19 @@
             "properties": {
                 "originURL": {
                     "type": "string",
-                    "description": "Blah"
+                    "description": "the Storage URL for the site"
                 },
                 "cdnURL": {
                     "type": "string",
-                    "description": "Blah."
+                    "description": "the CDN URL for the site"
                 },
                 "customDomainURL" : {
                     "type": "string",
-                    "description": "Fixme."
+                    "description": "the custom domain URL where the static website can be accessed"
                 },
                 "resourceGroupName" : {
                     "type": "string",
-                    "description": "Blah"
+                    "description": "the name of the resource group that was provisioned to contain the needed static website resources"
                 }
             },
             "required": [

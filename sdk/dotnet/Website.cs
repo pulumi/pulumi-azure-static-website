@@ -13,25 +13,25 @@ namespace Pulumi.AzureStaticWebsite
     public partial class Website : Pulumi.ComponentResource
     {
         /// <summary>
-        /// Blah.
+        /// the CDN URL for the site
         /// </summary>
         [Output("cdnURL")]
         public Output<string?> CdnURL { get; private set; } = null!;
 
         /// <summary>
-        /// Fixme.
+        /// the custom domain URL where the static website can be accessed
         /// </summary>
         [Output("customDomainURL")]
         public Output<string?> CustomDomainURL { get; private set; } = null!;
 
         /// <summary>
-        /// Blah
+        /// the Storage URL for the site
         /// </summary>
         [Output("originURL")]
         public Output<string> OriginURL { get; private set; } = null!;
 
         /// <summary>
-        /// Blah
+        /// the name of the resource group that was provisioned to contain the needed static website resources
         /// </summary>
         [Output("resourceGroupName")]
         public Output<string> ResourceGroupName { get; private set; } = null!;
@@ -65,7 +65,19 @@ namespace Pulumi.AzureStaticWebsite
     public sealed class WebsiteArgs : Pulumi.ResourceArgs
     {
         /// <summary>
-        /// default 404 page
+        /// The name of the DNS zone.
+        /// </summary>
+        [Input("dnsZoneName")]
+        public Input<string>? DnsZoneName { get; set; }
+
+        /// <summary>
+        /// The name of the resource group your domain is attached to
+        /// </summary>
+        [Input("domainResourceGroup")]
+        public Input<string>? DomainResourceGroup { get; set; }
+
+        /// <summary>
+        /// The default 404 error page
         /// </summary>
         [Input("errorDocument")]
         public Input<string>? ErrorDocument { get; set; }
@@ -83,10 +95,22 @@ namespace Pulumi.AzureStaticWebsite
         public Input<string> SitePath { get; set; } = null!;
 
         /// <summary>
-        /// Provision CloudFront CDN to serve content.
+        /// The subdomain used to access the static website. If not specified will configure with apex/root domain of the DNS zone specified.
+        /// </summary>
+        [Input("subdomain")]
+        public Input<string>? Subdomain { get; set; }
+
+        /// <summary>
+        /// Provision CDN to serve content.
         /// </summary>
         [Input("withCDN")]
         public Input<bool>? WithCDN { get; set; }
+
+        /// <summary>
+        /// Provision a custom domain to serve the site from. This will require a you to set the domainResourceGroup property to the name of the resource group your domain is attached to, as well as the dnsZoneName property for the name of the DNS zone, configured in Azure
+        /// </summary>
+        [Input("withCustomDomain")]
+        public Input<bool>? WithCustomDomain { get; set; }
 
         public WebsiteArgs()
         {

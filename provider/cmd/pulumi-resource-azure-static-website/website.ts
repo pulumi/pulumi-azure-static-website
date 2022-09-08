@@ -21,27 +21,49 @@ import * as mime from "mime";
 import * as glob from "glob";
 
 import { local } from "@pulumi/command";
+import { RecordSet } from "@pulumi/azure-native/network";
 
 export interface WebsiteArgs {
     /**
-     * The .
+     * The root directory containing the website's contents.
      */
     sitePath: string;
     
     /**
-     * The .
+     * The default document for the site. Defaults to index.html.
      */
     indexDocument: string;
 
     /**
-     * The .
+     * The default 404 error page.
      */
     errorDocument: string;
 
     /**
-     * The .
+     * Provision CDN to serve content.
      */
     withCDN: boolean;
+
+    /**
+     * Provision CDN to serve content.
+     */
+    withCustomDomain: boolean;
+    
+    /**
+     * The subdomain used to access the static website. If not specified will configure with the apex/root
+     * domain of the DNS zone specified.
+     */
+    subdomain: string;
+
+    /**
+     * The name of the resource group your domain is attached to.
+     */
+    domainResourceGroup: string;
+
+    /**
+     * The name of the DNS zone.
+     */
+    dnsZoneName: string;
 }
 
 export class Website extends pulumi.ComponentResource {
@@ -54,6 +76,10 @@ export class Website extends pulumi.ComponentResource {
     private indexDocument?: string;
     private errorDocument?: string;
     private withCDN: boolean;
+    private subdomain?: string;
+    private withCustomDomain?: boolean;
+    private domainResourceGroup?: string;
+    private dnsZoneName: string;
 
     constructor(name: string, args: WebsiteArgs, opts?: pulumi.ComponentResourceOptions) {
         super("azure-static-website:index:Website", name, args, opts);
@@ -62,9 +88,14 @@ export class Website extends pulumi.ComponentResource {
         this.indexDocument = args.indexDocument || "index.html";
         this.errorDocument = args.errorDocument || "error.html";
         this.withCDN = args.withCDN;
+        this.subdomain = args.subdomain;
+        this.domainResourceGroup = args.domainResourceGroup;
+        this.withCustomDomain = args.withCustomDomain;
 
         // Create a resource group to contain the website's resources.
         const resourceGroup = new resources.ResourceGroup("resource-group");
+
+        this.dnsZoneName = args.dnsZoneName;
 
         // Create a storage account for the website.
         const account = new storage.StorageAccount("account", {
@@ -134,36 +165,71 @@ export class Website extends pulumi.ComponentResource {
 
             this.cdnURL = pulumi.interpolate`https://${endpoint.hostName}`;
 
-            if (false) {
+            if (this.withCustomDomain) {
                 // Create a CNAME for the CDN endpoint. Note that since we create a resource group for this site but not a DNS zone, the DNS zone by definition lives in another resource group, so we require it as a config item with custom domains.
                 // Also note that this may need to be removed manually in the portal or CLI before a `pulumi destroy` will work. (Because of Azure restrictions.)
-                const dnsResourceGroup = resources.getResourceGroupOutput({ resourceGroupName: "pulumi-dev-shared" });
-                const cname = new network.RecordSet("cname", {
-                    resourceGroupName: dnsResourceGroup.name,
-                    relativeRecordSetName: "my-site",
-                    zoneName: "pulumi-dev.net",
-                    recordType: "CNAME",
-                    targetResource: {
-                        id: endpoint.id,
-                    },
-                });
+                const dnsResourceGroup = resources.getResourceGroupOutput({ resourceGroupName: this.domainResourceGroup });
 
-                // Create a custom domain.
-                const domain = new cdn.CustomDomain("domain", {
-                    resourceGroupName: resourceGroup.name,
-                    profileName: profile.name,
-                    endpointName: endpoint.name,
-                    hostName: cname.fqdn.apply(s => s.split(".").filter(s => s !== "").join(".")), // Swap out the trailing dot.
-                }, { dependsOn: cname }); // Remove this if it doesn't make a difference.
+                // If user specified site to be served at a subdomain, add the needed CNAME record for the subdomain, else configure to be served at the apex.
+                if (this.subdomain) {
+                    // Add cname for subdomain.
+                    const cname = new network.RecordSet("cname", {
+                        resourceGroupName: dnsResourceGroup.name,
+                        recordType: "CNAME",
+                        relativeRecordSetName: this.subdomain,
+                        zoneName: this.dnsZoneName,
+                        targetResource: {
+                            id: endpoint.id,
+                        },
+                    });
+                    // Create a custom domain.
+                    const domain = new cdn.CustomDomain("domain", {
+                        resourceGroupName: resourceGroup.name,
+                        profileName: profile.name,
+                        endpointName: endpoint.name,
+                        hostName: cname.fqdn.apply(s => s.split(".").filter(s => s !== "").join(".")), // Swap out the trailing dot.
+                    });
+                    this.customDomainURL = cname.fqdn.apply(fqdn => `https://${fqdn.split(".").filter(s => s !== "").join(".")}`);
+                    // Provision a managed SSL/TLS certificate for the custom domain. This isn't supported as a resource unfortunately, so until it is, we use the Command provider (and the Azure CLI) to create it. 
+                    // https://github.com/pulumi/pulumi-azure-native/issues/1443
+                    // https://github.com/Azure/azure-rest-api-specs/issues/17498
+                    const cert = new local.Command("enable-https", {
+                        create: pulumi.interpolate`az cdn custom-domain enable-https --resource-group ${resourceGroup.name} --profile-name ${profile.name} --endpoint-name ${endpoint.name} --name ${domain.name}`,
+                    });
+                } else {
+                    // Create A record to route to endpoint if subdomain not specified.
+                    const aRecord = new network.RecordSet("aRecord", {
+                        resourceGroupName: dnsResourceGroup.name,
+                        recordType: "A",
+                        relativeRecordSetName: "@",
+                        zoneName: this.dnsZoneName,
+                        ttl: 3600,
+                        targetResource: {
+                            id: endpoint.id,
+                        },
+                    });
+                    // Add cdnverify CNAME record.
+                    const cdnverify = new network.RecordSet("cdnverify", {
+                        resourceGroupName: dnsResourceGroup.name,
+                        recordType: "CNAME",
+                        relativeRecordSetName: "cdnverify",
+                        zoneName: this.dnsZoneName,
+                        ttl: 3600,
+                        cnameRecord: {
+                            cname: endpoint.hostName.apply(host => `cdnverify.${host}`),
+                        }
+                    });
 
-                // Provision a managed SSL/TLS certificate for the custom domain. This isn't supported as a resource unfortunately, so until it is, we use the Command provider (and the Azure CLI) to create it. 
-                // https://github.com/pulumi/pulumi-azure-native/issues/1443
-                // https://github.com/Azure/azure-rest-api-specs/issues/17498
-                const cert = new local.Command("enable-https", {
-                    create: pulumi.interpolate`az cdn custom-domain enable-https --resource-group ${resourceGroup.name} --profile-name ${profile.name} --endpoint-name ${endpoint.name} --name ${domain.name}`,
-                });
-
-                this.customDomainURL = cname.fqdn.apply(fqdn => `https://${fqdn.split(".").filter(s => s !== "").join(".")}`);
+                    // Create a custom domain for apex/root domain.
+                    // Note: Azure will not allow us to enable HTTPS at the apex. This is something the user will need to manually configure themselves.
+                    const apexDomain = new cdn.CustomDomain("domain", {
+                        resourceGroupName: resourceGroup.name,
+                        profileName: profile.name,
+                        endpointName: endpoint.name,
+                        hostName: aRecord.fqdn.apply(s => s.split(".").filter(s => s !== "").join(".")), // Swap out the trailing dot.
+                    });
+                    this.customDomainURL = aRecord.fqdn.apply(fqdn => `https://${fqdn.split(".").filter(s => s !== "").join(".")}`);
+                }
             }
         }
 

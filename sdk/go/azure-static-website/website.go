@@ -14,13 +14,13 @@ import (
 type Website struct {
 	pulumi.ResourceState
 
-	// Blah.
+	// the CDN URL for the site
 	CdnURL pulumi.StringPtrOutput `pulumi:"cdnURL"`
-	// Fixme.
+	// the custom domain URL where the static website can be accessed
 	CustomDomainURL pulumi.StringPtrOutput `pulumi:"customDomainURL"`
-	// Blah
+	// the Storage URL for the site
 	OriginURL pulumi.StringOutput `pulumi:"originURL"`
-	// Blah
+	// the name of the resource group that was provisioned to contain the needed static website resources
 	ResourceGroupName pulumi.StringOutput `pulumi:"resourceGroupName"`
 }
 
@@ -43,26 +43,42 @@ func NewWebsite(ctx *pulumi.Context,
 }
 
 type websiteArgs struct {
-	// default 404 page
+	// The name of the DNS zone.
+	DnsZoneName *string `pulumi:"dnsZoneName"`
+	// The name of the resource group your domain is attached to
+	DomainResourceGroup *string `pulumi:"domainResourceGroup"`
+	// The default 404 error page
 	ErrorDocument *string `pulumi:"errorDocument"`
 	// The default document for the site. Defaults to index.html
 	IndexDocument *string `pulumi:"indexDocument"`
 	// The root directory containing the website's contents.
 	SitePath string `pulumi:"sitePath"`
-	// Provision CloudFront CDN to serve content.
+	// The subdomain used to access the static website. If not specified will configure with apex/root domain of the DNS zone specified.
+	Subdomain *string `pulumi:"subdomain"`
+	// Provision CDN to serve content.
 	WithCDN *bool `pulumi:"withCDN"`
+	// Provision a custom domain to serve the site from. This will require a you to set the domainResourceGroup property to the name of the resource group your domain is attached to, as well as the dnsZoneName property for the name of the DNS zone, configured in Azure
+	WithCustomDomain *bool `pulumi:"withCustomDomain"`
 }
 
 // The set of arguments for constructing a Website resource.
 type WebsiteArgs struct {
-	// default 404 page
+	// The name of the DNS zone.
+	DnsZoneName pulumi.StringPtrInput
+	// The name of the resource group your domain is attached to
+	DomainResourceGroup pulumi.StringPtrInput
+	// The default 404 error page
 	ErrorDocument pulumi.StringPtrInput
 	// The default document for the site. Defaults to index.html
 	IndexDocument pulumi.StringPtrInput
 	// The root directory containing the website's contents.
 	SitePath pulumi.StringInput
-	// Provision CloudFront CDN to serve content.
+	// The subdomain used to access the static website. If not specified will configure with apex/root domain of the DNS zone specified.
+	Subdomain pulumi.StringPtrInput
+	// Provision CDN to serve content.
 	WithCDN pulumi.BoolPtrInput
+	// Provision a custom domain to serve the site from. This will require a you to set the domainResourceGroup property to the name of the resource group your domain is attached to, as well as the dnsZoneName property for the name of the DNS zone, configured in Azure
+	WithCustomDomain pulumi.BoolPtrInput
 }
 
 func (WebsiteArgs) ElementType() reflect.Type {
