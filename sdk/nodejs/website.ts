@@ -2,6 +2,7 @@
 // *** Do not edit by hand unless you're certain you know what you are doing! ***
 
 import * as pulumi from "@pulumi/pulumi";
+import { input as inputs, output as outputs } from "./types";
 import * as utilities from "./utilities";
 
 export class Website extends pulumi.ComponentResource {
@@ -20,19 +21,27 @@ export class Website extends pulumi.ComponentResource {
     }
 
     /**
-     * Blah.
+     * The CDN hostname of the website.
+     */
+    public /*out*/ readonly cdnHostname!: pulumi.Output<string | undefined>;
+    /**
+     * The CDN URL of the website.
      */
     public /*out*/ readonly cdnURL!: pulumi.Output<string | undefined>;
     /**
-     * Fixme.
+     * The custom-domain URL of the website.
      */
-    public /*out*/ readonly customDomainURL!: pulumi.Output<string | undefined>;
+    public /*out*/ readonly domainURL!: pulumi.Output<string | undefined>;
     /**
-     * Blah
+     * The hostname of the origin.
+     */
+    public /*out*/ readonly originHostname!: pulumi.Output<string>;
+    /**
+     * The direct URL of the website.
      */
     public /*out*/ readonly originURL!: pulumi.Output<string>;
     /**
-     * Blah
+     * The name of the created resource group.
      */
     public /*out*/ readonly resourceGroupName!: pulumi.Output<string>;
 
@@ -50,17 +59,23 @@ export class Website extends pulumi.ComponentResource {
             if ((!args || args.sitePath === undefined) && !opts.urn) {
                 throw new Error("Missing required property 'sitePath'");
             }
-            resourceInputs["errorDocument"] = args ? args.errorDocument : undefined;
-            resourceInputs["indexDocument"] = args ? args.indexDocument : undefined;
+            resourceInputs["cdn"] = args ? args.cdn : undefined;
+            resourceInputs["domain"] = args ? args.domain : undefined;
+            resourceInputs["errorDoc"] = args ? args.errorDoc : undefined;
+            resourceInputs["indexDoc"] = args ? args.indexDoc : undefined;
             resourceInputs["sitePath"] = args ? args.sitePath : undefined;
-            resourceInputs["withCDN"] = args ? args.withCDN : undefined;
+            resourceInputs["storage"] = args ? args.storage : undefined;
+            resourceInputs["cdnHostname"] = undefined /*out*/;
             resourceInputs["cdnURL"] = undefined /*out*/;
-            resourceInputs["customDomainURL"] = undefined /*out*/;
+            resourceInputs["domainURL"] = undefined /*out*/;
+            resourceInputs["originHostname"] = undefined /*out*/;
             resourceInputs["originURL"] = undefined /*out*/;
             resourceInputs["resourceGroupName"] = undefined /*out*/;
         } else {
+            resourceInputs["cdnHostname"] = undefined /*out*/;
             resourceInputs["cdnURL"] = undefined /*out*/;
-            resourceInputs["customDomainURL"] = undefined /*out*/;
+            resourceInputs["domainURL"] = undefined /*out*/;
+            resourceInputs["originHostname"] = undefined /*out*/;
             resourceInputs["originURL"] = undefined /*out*/;
             resourceInputs["resourceGroupName"] = undefined /*out*/;
         }
@@ -73,20 +88,25 @@ export class Website extends pulumi.ComponentResource {
  * The set of arguments for constructing a Website resource.
  */
 export interface WebsiteArgs {
+    cdn?: pulumi.Input<boolean | inputs.WebsiteCDNConfigArgs>;
     /**
-     * default 404 page
+     * The domain configuration of the website.
      */
-    errorDocument?: pulumi.Input<string>;
+    domain?: pulumi.Input<inputs.WebsiteDomainConfigArgs>;
     /**
-     * The default document for the site. Defaults to index.html
+     * The default error page for the website. Defaults to error.html.
      */
-    indexDocument?: pulumi.Input<string>;
+    errorDoc?: pulumi.Input<string>;
     /**
-     * The root directory containing the website's contents.
+     * The default document for the site. Defaults to index.html.
+     */
+    indexDoc?: pulumi.Input<string>;
+    /**
+     * The root directory containing contents of the built website contents.
      */
     sitePath: pulumi.Input<string>;
     /**
-     * Provision CloudFront CDN to serve content.
+     * The storage configuration of the website.
      */
-    withCDN?: pulumi.Input<boolean>;
+    storage?: pulumi.Input<inputs.WebsiteStorageConfigArgs>;
 }

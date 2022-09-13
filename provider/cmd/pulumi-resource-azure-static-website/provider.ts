@@ -43,9 +43,11 @@ async function constructWebsite(name: string, inputs: pulumi.Inputs,
     return {
         urn: website.urn,
         state: {
-            originURL: website.originURL,
             cdnURL: website.cdnURL,
-            customDomainURL: website.customDomainURL,
+            cdnHostname: website.cdnHostname,
+            originURL: website.originURL,
+            originHostname: website.originHostname,
+            domainURL: website.domainURL,
             resourceGroupName: website.resourceGroupName,
         },
     };

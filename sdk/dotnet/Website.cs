@@ -13,25 +13,37 @@ namespace Pulumi.AzureStaticWebsite
     public partial class Website : Pulumi.ComponentResource
     {
         /// <summary>
-        /// Blah.
+        /// The CDN hostname of the website.
+        /// </summary>
+        [Output("cdnHostname")]
+        public Output<string?> CdnHostname { get; private set; } = null!;
+
+        /// <summary>
+        /// The CDN URL of the website.
         /// </summary>
         [Output("cdnURL")]
         public Output<string?> CdnURL { get; private set; } = null!;
 
         /// <summary>
-        /// Fixme.
+        /// The custom-domain URL of the website.
         /// </summary>
-        [Output("customDomainURL")]
-        public Output<string?> CustomDomainURL { get; private set; } = null!;
+        [Output("domainURL")]
+        public Output<string?> DomainURL { get; private set; } = null!;
 
         /// <summary>
-        /// Blah
+        /// The hostname of the origin.
+        /// </summary>
+        [Output("originHostname")]
+        public Output<string> OriginHostname { get; private set; } = null!;
+
+        /// <summary>
+        /// The direct URL of the website.
         /// </summary>
         [Output("originURL")]
         public Output<string> OriginURL { get; private set; } = null!;
 
         /// <summary>
-        /// Blah
+        /// The name of the created resource group.
         /// </summary>
         [Output("resourceGroupName")]
         public Output<string> ResourceGroupName { get; private set; } = null!;
@@ -64,29 +76,38 @@ namespace Pulumi.AzureStaticWebsite
 
     public sealed class WebsiteArgs : Pulumi.ResourceArgs
     {
-        /// <summary>
-        /// default 404 page
-        /// </summary>
-        [Input("errorDocument")]
-        public Input<string>? ErrorDocument { get; set; }
+        [Input("cdn")]
+        public InputUnion<bool, Inputs.WebsiteCDNConfigArgs>? Cdn { get; set; }
 
         /// <summary>
-        /// The default document for the site. Defaults to index.html
+        /// The domain configuration of the website.
         /// </summary>
-        [Input("indexDocument")]
-        public Input<string>? IndexDocument { get; set; }
+        [Input("domain")]
+        public Input<Inputs.WebsiteDomainConfigArgs>? Domain { get; set; }
 
         /// <summary>
-        /// The root directory containing the website's contents.
+        /// The default error page for the website. Defaults to error.html.
+        /// </summary>
+        [Input("errorDoc")]
+        public Input<string>? ErrorDoc { get; set; }
+
+        /// <summary>
+        /// The default document for the site. Defaults to index.html.
+        /// </summary>
+        [Input("indexDoc")]
+        public Input<string>? IndexDoc { get; set; }
+
+        /// <summary>
+        /// The root directory containing contents of the built website contents.
         /// </summary>
         [Input("sitePath", required: true)]
         public Input<string> SitePath { get; set; } = null!;
 
         /// <summary>
-        /// Provision CloudFront CDN to serve content.
+        /// The storage configuration of the website.
         /// </summary>
-        [Input("withCDN")]
-        public Input<bool>? WithCDN { get; set; }
+        [Input("storage")]
+        public Input<Inputs.WebsiteStorageConfigArgs>? Storage { get; set; }
 
         public WebsiteArgs()
         {

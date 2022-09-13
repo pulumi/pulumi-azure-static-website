@@ -14,13 +14,17 @@ import (
 type Website struct {
 	pulumi.ResourceState
 
-	// Blah.
+	// The CDN hostname of the website.
+	CdnHostname pulumi.StringPtrOutput `pulumi:"cdnHostname"`
+	// The CDN URL of the website.
 	CdnURL pulumi.StringPtrOutput `pulumi:"cdnURL"`
-	// Fixme.
-	CustomDomainURL pulumi.StringPtrOutput `pulumi:"customDomainURL"`
-	// Blah
+	// The custom-domain URL of the website.
+	DomainURL pulumi.StringPtrOutput `pulumi:"domainURL"`
+	// The hostname of the origin.
+	OriginHostname pulumi.StringOutput `pulumi:"originHostname"`
+	// The direct URL of the website.
 	OriginURL pulumi.StringOutput `pulumi:"originURL"`
-	// Blah
+	// The name of the created resource group.
 	ResourceGroupName pulumi.StringOutput `pulumi:"resourceGroupName"`
 }
 
@@ -43,26 +47,32 @@ func NewWebsite(ctx *pulumi.Context,
 }
 
 type websiteArgs struct {
-	// default 404 page
-	ErrorDocument *string `pulumi:"errorDocument"`
-	// The default document for the site. Defaults to index.html
-	IndexDocument *string `pulumi:"indexDocument"`
-	// The root directory containing the website's contents.
+	Cdn interface{} `pulumi:"cdn"`
+	// The domain configuration of the website.
+	Domain *WebsiteDomainConfig `pulumi:"domain"`
+	// The default error page for the website. Defaults to error.html.
+	ErrorDoc *string `pulumi:"errorDoc"`
+	// The default document for the site. Defaults to index.html.
+	IndexDoc *string `pulumi:"indexDoc"`
+	// The root directory containing contents of the built website contents.
 	SitePath string `pulumi:"sitePath"`
-	// Provision CloudFront CDN to serve content.
-	WithCDN *bool `pulumi:"withCDN"`
+	// The storage configuration of the website.
+	Storage *WebsiteStorageConfig `pulumi:"storage"`
 }
 
 // The set of arguments for constructing a Website resource.
 type WebsiteArgs struct {
-	// default 404 page
-	ErrorDocument pulumi.StringPtrInput
-	// The default document for the site. Defaults to index.html
-	IndexDocument pulumi.StringPtrInput
-	// The root directory containing the website's contents.
+	Cdn pulumi.Input
+	// The domain configuration of the website.
+	Domain WebsiteDomainConfigPtrInput
+	// The default error page for the website. Defaults to error.html.
+	ErrorDoc pulumi.StringPtrInput
+	// The default document for the site. Defaults to index.html.
+	IndexDoc pulumi.StringPtrInput
+	// The root directory containing contents of the built website contents.
 	SitePath pulumi.StringInput
-	// Provision CloudFront CDN to serve content.
-	WithCDN pulumi.BoolPtrInput
+	// The storage configuration of the website.
+	Storage WebsiteStorageConfigPtrInput
 }
 
 func (WebsiteArgs) ElementType() reflect.Type {

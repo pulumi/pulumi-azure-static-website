@@ -2,6 +2,8 @@
     "version": "${VERSION}",
     "bin": "bin/index.js",
     "dependencies": {
+        "@azure/arm-cdn": "^7.0.1",
+        "@azure/identity": "^2.1.0",
         "@pulumi/aws": "^5.0.0",
         "@pulumi/azure-native": "^1.67.0",
         "@pulumi/command": "^0.4.1",
