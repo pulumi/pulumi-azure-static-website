@@ -1,5 +1,17 @@
 {
     "name": "azure-static-website",
+    "version": "v0.0.1",
+    "description": "A component to deploy static websites to Azure",
+    "keywords": [
+        "pulumi",
+        "azure",
+        "category/cloud",
+        "kind/component",
+        "web"
+    ],
+    "homepage": "https://pulumi.com",
+    "repository": "https://github.com/pulumi/pulumi-azure-static-website",
+    "publisher": "Pulumi",
     "resources": {
         "azure-static-website:index:Website": {
             "isComponent": true,
@@ -43,19 +55,19 @@
             "properties": {
                 "originURL": {
                     "type": "string",
-                    "description": "the Storage URL for the site"
+                    "description": "The Storage URL for the site"
                 },
                 "cdnURL": {
                     "type": "string",
-                    "description": "the CDN URL for the site"
+                    "description": "The CDN URL for the site"
                 },
                 "customDomainURL" : {
                     "type": "string",
-                    "description": "the custom domain URL where the static website can be accessed"
+                    "description": "The custom domain URL where the static website can be accessed"
                 },
                 "resourceGroupName" : {
                     "type": "string",
-                    "description": "the name of the resource group that was provisioned to contain the needed static website resources"
+                    "description": "The name of the resource group that was provisioned to contain the needed static website resources"
                 }
             },
             "required": [
