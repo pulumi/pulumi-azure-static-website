@@ -1,9 +1,18 @@
 {
     "name": "@pulumi/azure-static-website",
-    "version": "${VERSION}",
+    "version": "0.0.1",
+    "keywords": [
+        "pulumi",
+        "azure",
+        "category/cloud",
+        "kind/component",
+        "web"
+    ],
+    "homepage": "https://pulumi.com",
+    "repository": "https://github.com/pulumi/pulumi-azure-static-website",
     "scripts": {
         "build": "tsc",
-        "install": "node scripts/install-pulumi-plugin.js resource azure-static-website ${VERSION}"
+        "install": "node scripts/install-pulumi-plugin.js resource azure-static-website 0.0.1"
     },
     "dependencies": {
         "@pulumi/aws": "^5.0.0"
@@ -15,6 +24,7 @@
         "@pulumi/pulumi": "latest"
     },
     "pulumi": {
+        "version": "0.0.1",
         "resource": true
     }
 }

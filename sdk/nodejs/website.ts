@@ -20,19 +20,19 @@ export class Website extends pulumi.ComponentResource {
     }
 
     /**
-     * the CDN URL for the site
+     * The CDN URL for the site
      */
     public /*out*/ readonly cdnURL!: pulumi.Output<string | undefined>;
     /**
-     * the custom domain URL where the static website can be accessed
+     * The custom domain URL where the static website can be accessed
      */
     public /*out*/ readonly customDomainURL!: pulumi.Output<string | undefined>;
     /**
-     * the Storage URL for the site
+     * The Storage URL for the site
      */
     public /*out*/ readonly originURL!: pulumi.Output<string>;
     /**
-     * the name of the resource group that was provisioned to contain the needed static website resources
+     * The name of the resource group that was provisioned to contain the needed static website resources
      */
     public /*out*/ readonly resourceGroupName!: pulumi.Output<string>;
 
@@ -57,7 +57,6 @@ export class Website extends pulumi.ComponentResource {
             resourceInputs["sitePath"] = args ? args.sitePath : undefined;
             resourceInputs["subdomain"] = args ? args.subdomain : undefined;
             resourceInputs["withCDN"] = args ? args.withCDN : undefined;
-            resourceInputs["withCustomDomain"] = args ? args.withCustomDomain : undefined;
             resourceInputs["cdnURL"] = undefined /*out*/;
             resourceInputs["customDomainURL"] = undefined /*out*/;
             resourceInputs["originURL"] = undefined /*out*/;
@@ -78,11 +77,11 @@ export class Website extends pulumi.ComponentResource {
  */
 export interface WebsiteArgs {
     /**
-     * The name of the DNS zone.
+     * The name of the DNS zone that will be used to serve the static website. This must be set in order for this component to make the site accessible from a custom domain
      */
     dnsZoneName?: pulumi.Input<string>;
     /**
-     * The name of the resource group your domain is attached to
+     * The name of the resource group your DNS zone is attached to
      */
     domainResourceGroup?: pulumi.Input<string>;
     /**
@@ -105,8 +104,4 @@ export interface WebsiteArgs {
      * Provision CDN to serve content.
      */
     withCDN?: pulumi.Input<boolean>;
-    /**
-     * Provision a custom domain to serve the site from. This will require a you to set the domainResourceGroup property to the name of the resource group your domain is attached to, as well as the dnsZoneName property for the name of the DNS zone, configured in Azure
-     */
-    withCustomDomain?: pulumi.Input<boolean>;
 }

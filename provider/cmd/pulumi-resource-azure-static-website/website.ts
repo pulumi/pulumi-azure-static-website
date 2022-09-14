@@ -45,11 +45,6 @@ export interface WebsiteArgs {
     withCDN: boolean;
 
     /**
-     * Provision CDN to serve content.
-     */
-    withCustomDomain: boolean;
-    
-    /**
      * The subdomain used to access the static website. If not specified will configure with the apex/root
      * domain of the DNS zone specified.
      */
@@ -77,7 +72,6 @@ export class Website extends pulumi.ComponentResource {
     private errorDocument?: string;
     private withCDN: boolean;
     private subdomain?: string;
-    private withCustomDomain?: boolean;
     private domainResourceGroup?: string;
     private dnsZoneName: string;
 
@@ -90,7 +84,6 @@ export class Website extends pulumi.ComponentResource {
         this.withCDN = args.withCDN;
         this.subdomain = args.subdomain;
         this.domainResourceGroup = args.domainResourceGroup;
-        this.withCustomDomain = args.withCustomDomain;
 
         // Create a resource group to contain the website's resources.
         const resourceGroup = new resources.ResourceGroup("resource-group");
@@ -165,7 +158,7 @@ export class Website extends pulumi.ComponentResource {
 
             this.cdnURL = pulumi.interpolate`https://${endpoint.hostName}`;
 
-            if (this.withCustomDomain) {
+            if (this.dnsZoneName) {
                 // Create a CNAME for the CDN endpoint. Note that since we create a resource group for this site but not a DNS zone, the DNS zone by definition lives in another resource group, so we require it as a config item with custom domains.
                 // Also note that this may need to be removed manually in the portal or CLI before a `pulumi destroy` will work. (Because of Azure restrictions.)
                 const dnsResourceGroup = resources.getResourceGroupOutput({ resourceGroupName: this.domainResourceGroup });

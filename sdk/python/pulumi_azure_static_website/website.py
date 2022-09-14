@@ -19,18 +19,16 @@ class WebsiteArgs:
                  error_document: Optional[pulumi.Input[str]] = None,
                  index_document: Optional[pulumi.Input[str]] = None,
                  subdomain: Optional[pulumi.Input[str]] = None,
-                 with_cdn: Optional[pulumi.Input[bool]] = None,
-                 with_custom_domain: Optional[pulumi.Input[bool]] = None):
+                 with_cdn: Optional[pulumi.Input[bool]] = None):
         """
         The set of arguments for constructing a Website resource.
         :param pulumi.Input[str] site_path: The root directory containing the website's contents.
-        :param pulumi.Input[str] dns_zone_name: The name of the DNS zone.
-        :param pulumi.Input[str] domain_resource_group: The name of the resource group your domain is attached to
+        :param pulumi.Input[str] dns_zone_name: The name of the DNS zone that will be used to serve the static website. This must be set in order for this component to make the site accessible from a custom domain
+        :param pulumi.Input[str] domain_resource_group: The name of the resource group your DNS zone is attached to
         :param pulumi.Input[str] error_document: The default 404 error page
         :param pulumi.Input[str] index_document: The default document for the site. Defaults to index.html
         :param pulumi.Input[str] subdomain: The subdomain used to access the static website. If not specified will configure with apex/root domain of the DNS zone specified.
         :param pulumi.Input[bool] with_cdn: Provision CDN to serve content.
-        :param pulumi.Input[bool] with_custom_domain: Provision a custom domain to serve the site from. This will require a you to set the domainResourceGroup property to the name of the resource group your domain is attached to, as well as the dnsZoneName property for the name of the DNS zone, configured in Azure
         """
         pulumi.set(__self__, "site_path", site_path)
         if dns_zone_name is not None:
@@ -45,8 +43,6 @@ class WebsiteArgs:
             pulumi.set(__self__, "subdomain", subdomain)
         if with_cdn is not None:
             pulumi.set(__self__, "with_cdn", with_cdn)
-        if with_custom_domain is not None:
-            pulumi.set(__self__, "with_custom_domain", with_custom_domain)
 
     @property
     @pulumi.getter(name="sitePath")
@@ -64,7 +60,7 @@ class WebsiteArgs:
     @pulumi.getter(name="dnsZoneName")
     def dns_zone_name(self) -> Optional[pulumi.Input[str]]:
         """
-        The name of the DNS zone.
+        The name of the DNS zone that will be used to serve the static website. This must be set in order for this component to make the site accessible from a custom domain
         """
         return pulumi.get(self, "dns_zone_name")
 
@@ -76,7 +72,7 @@ class WebsiteArgs:
     @pulumi.getter(name="domainResourceGroup")
     def domain_resource_group(self) -> Optional[pulumi.Input[str]]:
         """
-        The name of the resource group your domain is attached to
+        The name of the resource group your DNS zone is attached to
         """
         return pulumi.get(self, "domain_resource_group")
 
@@ -132,18 +128,6 @@ class WebsiteArgs:
     def with_cdn(self, value: Optional[pulumi.Input[bool]]):
         pulumi.set(self, "with_cdn", value)
 
-    @property
-    @pulumi.getter(name="withCustomDomain")
-    def with_custom_domain(self) -> Optional[pulumi.Input[bool]]:
-        """
-        Provision a custom domain to serve the site from. This will require a you to set the domainResourceGroup property to the name of the resource group your domain is attached to, as well as the dnsZoneName property for the name of the DNS zone, configured in Azure
-        """
-        return pulumi.get(self, "with_custom_domain")
-
-    @with_custom_domain.setter
-    def with_custom_domain(self, value: Optional[pulumi.Input[bool]]):
-        pulumi.set(self, "with_custom_domain", value)
-
 
 class Website(pulumi.ComponentResource):
     @overload
@@ -157,20 +141,18 @@ class Website(pulumi.ComponentResource):
                  site_path: Optional[pulumi.Input[str]] = None,
                  subdomain: Optional[pulumi.Input[str]] = None,
                  with_cdn: Optional[pulumi.Input[bool]] = None,
-                 with_custom_domain: Optional[pulumi.Input[bool]] = None,
                  __props__=None):
         """
         Create a Website resource with the given unique name, props, and options.
         :param str resource_name: The name of the resource.
         :param pulumi.ResourceOptions opts: Options for the resource.
-        :param pulumi.Input[str] dns_zone_name: The name of the DNS zone.
-        :param pulumi.Input[str] domain_resource_group: The name of the resource group your domain is attached to
+        :param pulumi.Input[str] dns_zone_name: The name of the DNS zone that will be used to serve the static website. This must be set in order for this component to make the site accessible from a custom domain
+        :param pulumi.Input[str] domain_resource_group: The name of the resource group your DNS zone is attached to
         :param pulumi.Input[str] error_document: The default 404 error page
         :param pulumi.Input[str] index_document: The default document for the site. Defaults to index.html
         :param pulumi.Input[str] site_path: The root directory containing the website's contents.
         :param pulumi.Input[str] subdomain: The subdomain used to access the static website. If not specified will configure with apex/root domain of the DNS zone specified.
         :param pulumi.Input[bool] with_cdn: Provision CDN to serve content.
-        :param pulumi.Input[bool] with_custom_domain: Provision a custom domain to serve the site from. This will require a you to set the domainResourceGroup property to the name of the resource group your domain is attached to, as well as the dnsZoneName property for the name of the DNS zone, configured in Azure
         """
         ...
     @overload
@@ -202,7 +184,6 @@ class Website(pulumi.ComponentResource):
                  site_path: Optional[pulumi.Input[str]] = None,
                  subdomain: Optional[pulumi.Input[str]] = None,
                  with_cdn: Optional[pulumi.Input[bool]] = None,
-                 with_custom_domain: Optional[pulumi.Input[bool]] = None,
                  __props__=None):
         if opts is None:
             opts = pulumi.ResourceOptions()
@@ -226,7 +207,6 @@ class Website(pulumi.ComponentResource):
             __props__.__dict__["site_path"] = site_path
             __props__.__dict__["subdomain"] = subdomain
             __props__.__dict__["with_cdn"] = with_cdn
-            __props__.__dict__["with_custom_domain"] = with_custom_domain
             __props__.__dict__["cdn_url"] = None
             __props__.__dict__["custom_domain_url"] = None
             __props__.__dict__["origin_url"] = None
@@ -242,7 +222,7 @@ class Website(pulumi.ComponentResource):
     @pulumi.getter(name="cdnURL")
     def cdn_url(self) -> pulumi.Output[Optional[str]]:
         """
-        the CDN URL for the site
+        The CDN URL for the site
         """
         return pulumi.get(self, "cdn_url")
 
@@ -250,7 +230,7 @@ class Website(pulumi.ComponentResource):
     @pulumi.getter(name="customDomainURL")
     def custom_domain_url(self) -> pulumi.Output[Optional[str]]:
         """
-        the custom domain URL where the static website can be accessed
+        The custom domain URL where the static website can be accessed
         """
         return pulumi.get(self, "custom_domain_url")
 
@@ -258,7 +238,7 @@ class Website(pulumi.ComponentResource):
     @pulumi.getter(name="originURL")
     def origin_url(self) -> pulumi.Output[str]:
         """
-        the Storage URL for the site
+        The Storage URL for the site
         """
         return pulumi.get(self, "origin_url")
 
@@ -266,7 +246,7 @@ class Website(pulumi.ComponentResource):
     @pulumi.getter(name="resourceGroupName")
     def resource_group_name(self) -> pulumi.Output[str]:
         """
-        the name of the resource group that was provisioned to contain the needed static website resources
+        The name of the resource group that was provisioned to contain the needed static website resources
         """
         return pulumi.get(self, "resource_group_name")
 

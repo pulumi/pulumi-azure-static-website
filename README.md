@@ -38,9 +38,8 @@ This component takes the following inputs.
 - withCDN (boolean) - provision a CDN to serve content
 - error404 (string) - the default 404 error page
 - index.html (string) - the default document for the site. Defaults to index.html
-- withCustomDomain (boolean) - Provision a custom domain to serve the site from. This will require a you to set the domainResourceGroup property to the name of the resource group your domain is attached to, as well as the dnsZoneName property for the name of the DNS zone, configured in Azure
 - domainResourceGroup (string) - The name of the resource group your domain is attached to
-- dnsZoneName (string) - The name of the DNS zone
+- dnsZoneName (string) - The name of the DNS zone that will be used to serve the static website. This must be set in order for this component to make the site accessible from a custom domain. See [Azure docs](https://docs.microsoft.com/en-us/azure/dns/dns-zones-records) for more info.
 - subdomain (string) - The subdomain used to access the static website. If not specified will configure with apex/root domain of the DNS zone specified
 
 ## Outputs
@@ -53,5 +52,6 @@ This component takes the following inputs.
 
 ## Notes:
 
+- If you would like to serve your site from a custom domain, you need to configure a DNS zone in Azure and set the name of the zone using the `dnsZoneName` input property
 - If a subdomain is not specified, the contents will be served from the apex. Serving the website over HTTPS is something that will need to be manually configured, as Azure will sign free certs for the subdomains, but not for the root domain.
 - When destroying the site, you will need to manually delete the CNAME record that was provisioned for the domain (either using the console or CLI) in order for `pulumi destroy` to succeed.

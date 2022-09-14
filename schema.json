@@ -32,17 +32,13 @@
                     "type": "string",
                     "description": "The default 404 error page"
                 },
-                "withCustomDomain": {
-                    "type": "boolean",
-                    "description": "Provision a custom domain to serve the site from. This will require a you to set the domainResourceGroup property to the name of the resource group your domain is attached to, as well as the dnsZoneName property for the name of the DNS zone, configured in Azure"
+                "dnsZoneName": {
+                    "type": "string",
+                    "description": "The name of the DNS zone that will be used to serve the static website. This must be set in order for this component to make the site accessible from a custom domain"
                 },
                 "domainResourceGroup": {
                     "type": "string",
-                    "description": "The name of the resource group your domain is attached to"
-                },
-                "dnsZoneName": {
-                    "type": "string",
-                    "description": "The name of the DNS zone."
+                    "description": "The name of the resource group your DNS zone is attached to"
                 },
                 "subdomain": {
                     "type": "string",

@@ -8,8 +8,8 @@ from setuptools.command.install import install
 from subprocess import check_call
 
 
-VERSION = "0.0.0"
-PLUGIN_VERSION = "0.0.0"
+VERSION = "0.0.1"
+PLUGIN_VERSION = "0.0.1"
 
 class InstallPluginCommand(install):
     def run(self):
@@ -39,10 +39,16 @@ def readme():
 
 setup(name='pulumi_azure_static_website',
       version=VERSION,
+      description="A component to deploy static websites to Azure",
       long_description=readme(),
       long_description_content_type='text/markdown',
       cmdclass={
           'install': InstallPluginCommand,
+      },
+      keywords='pulumi azure category/cloud kind/component web',
+      url='https://pulumi.com',
+      project_urls={
+          'Repository': 'https://github.com/pulumi/pulumi-azure-static-website'
       },
       packages=find_packages(),
       package_data={
