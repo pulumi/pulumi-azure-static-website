@@ -1,12 +1,24 @@
 {
     "name": "azure-static-website",
+    "version": "v0.0.1",
+    "description": "A component to deploy static websites to Azure",
+    "keywords": [
+        "pulumi",
+        "azure",
+        "category/cloud",
+        "kind/component",
+        "web"
+    ],
+    "homepage": "https://pulumi.com",
+    "repository": "https://github.com/pulumi/pulumi-azure-static-website",
+    "publisher": "Pulumi",
     "resources": {
         "azure-static-website:index:Website": {
             "isComponent": true,
             "inputProperties": {
                 "withCDN": {
                     "type": "boolean",
-                    "description": "Provision CloudFront CDN to serve content."
+                    "description": "Provision CDN to serve content."
                 },
                 "sitePath": {
                     "type": "string",
@@ -18,7 +30,19 @@
                 },
                 "errorDocument": {
                     "type": "string",
-                    "description": "default 404 page"
+                    "description": "The default 404 error page"
+                },
+                "dnsZoneName": {
+                    "type": "string",
+                    "description": "The name of the DNS zone that will be used to serve the static website. This must be set in order for this component to make the site accessible from a custom domain"
+                },
+                "domainResourceGroup": {
+                    "type": "string",
+                    "description": "The name of the resource group your DNS zone is attached to"
+                },
+                "subdomain": {
+                    "type": "string",
+                    "description": "The subdomain used to access the static website. If not specified will configure with apex/root domain of the DNS zone specified."
                 }
             },
             "requiredInputs": [
@@ -27,19 +51,19 @@
             "properties": {
                 "originURL": {
                     "type": "string",
-                    "description": "Blah"
+                    "description": "The Storage URL for the site"
                 },
                 "cdnURL": {
                     "type": "string",
-                    "description": "Blah."
+                    "description": "The CDN URL for the site"
                 },
                 "customDomainURL" : {
                     "type": "string",
-                    "description": "Fixme."
+                    "description": "The custom domain URL where the static website can be accessed"
                 },
                 "resourceGroupName" : {
                     "type": "string",
-                    "description": "Blah"
+                    "description": "The name of the resource group that was provisioned to contain the needed static website resources"
                 }
             },
             "required": [

@@ -20,19 +20,19 @@ export class Website extends pulumi.ComponentResource {
     }
 
     /**
-     * Blah.
+     * The CDN URL for the site
      */
     public /*out*/ readonly cdnURL!: pulumi.Output<string | undefined>;
     /**
-     * Fixme.
+     * The custom domain URL where the static website can be accessed
      */
     public /*out*/ readonly customDomainURL!: pulumi.Output<string | undefined>;
     /**
-     * Blah
+     * The Storage URL for the site
      */
     public /*out*/ readonly originURL!: pulumi.Output<string>;
     /**
-     * Blah
+     * The name of the resource group that was provisioned to contain the needed static website resources
      */
     public /*out*/ readonly resourceGroupName!: pulumi.Output<string>;
 
@@ -50,9 +50,12 @@ export class Website extends pulumi.ComponentResource {
             if ((!args || args.sitePath === undefined) && !opts.urn) {
                 throw new Error("Missing required property 'sitePath'");
             }
+            resourceInputs["dnsZoneName"] = args ? args.dnsZoneName : undefined;
+            resourceInputs["domainResourceGroup"] = args ? args.domainResourceGroup : undefined;
             resourceInputs["errorDocument"] = args ? args.errorDocument : undefined;
             resourceInputs["indexDocument"] = args ? args.indexDocument : undefined;
             resourceInputs["sitePath"] = args ? args.sitePath : undefined;
+            resourceInputs["subdomain"] = args ? args.subdomain : undefined;
             resourceInputs["withCDN"] = args ? args.withCDN : undefined;
             resourceInputs["cdnURL"] = undefined /*out*/;
             resourceInputs["customDomainURL"] = undefined /*out*/;
@@ -74,7 +77,15 @@ export class Website extends pulumi.ComponentResource {
  */
 export interface WebsiteArgs {
     /**
-     * default 404 page
+     * The name of the DNS zone that will be used to serve the static website. This must be set in order for this component to make the site accessible from a custom domain
+     */
+    dnsZoneName?: pulumi.Input<string>;
+    /**
+     * The name of the resource group your DNS zone is attached to
+     */
+    domainResourceGroup?: pulumi.Input<string>;
+    /**
+     * The default 404 error page
      */
     errorDocument?: pulumi.Input<string>;
     /**
@@ -86,7 +97,11 @@ export interface WebsiteArgs {
      */
     sitePath: pulumi.Input<string>;
     /**
-     * Provision CloudFront CDN to serve content.
+     * The subdomain used to access the static website. If not specified will configure with apex/root domain of the DNS zone specified.
+     */
+    subdomain?: pulumi.Input<string>;
+    /**
+     * Provision CDN to serve content.
      */
     withCDN?: pulumi.Input<boolean>;
 }

@@ -1,3 +1,3 @@
-// Package azure-static-website exports types, functions, subpackages for provisioning azure-static-website resources.
+// A component to deploy static websites to Azure
 //
 package azurestaticwebsite
