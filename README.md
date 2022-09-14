@@ -1,6 +1,6 @@
 # pulumi-azure-static-website
 
-This component makes it easy to deploy a static website to Azure along using any of the supported Pulumi programming languages.
+This component makes it easy to deploy a static website to Azure using any of the supported Pulumi programming languages.
 
 ## Usage
 
